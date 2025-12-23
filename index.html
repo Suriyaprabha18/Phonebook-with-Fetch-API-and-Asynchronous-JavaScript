@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PhoneBook App</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f3f7;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 700px;
+            margin: auto;
+            margin-top: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            background: #4a4cf0;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px #00000020;
+        }
+
+        .form-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px #00000020;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: #4a4cf0;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #2e31c7;
+        }
+
+        .contact-card {
+            background: white;
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 12px #00000015;
+        }
+
+        .contact-card img {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+            border: 2px solid #4a4cf0;
+        }
+
+        .info {
+            flex: 1;
+        }
+
+        .delete-btn {
+            background: #ff3b3b;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .delete-btn:hover {
+            background: #d40000;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>📞 PhoneBook App</h1>
+
+    <div class="container">
+
+        <!-- ADD CONTACT FORM -->
+        <div class="form-box">
+            <h2>Add New Contact</h2>
+
+            <input type="text" id="name" placeholder="Name">
+            <input type="text" id="phone" placeholder="Phone Number">
+            <input type="text" id="email" placeholder="Email (optional)">
+            <input type="text" id="photo" placeholder="Photo URL (optional)">
+
+            <button onclick="addContact()">Add Contact</button>
+        </div>
+
+        <!-- CONTACT LIST -->
+        <div id="contacts"></div>
+
+    </div>
+
+<script>
+
+const apiURL = "https://693a63b29b80ba7262c9b763.mockapi.io/contacts";
+
+// Load all contacts
+async function loadContacts() {
+    const res = await fetch(apiURL);
+    const data = await res.json();
+
+    let output = "";
+
+    data.forEach(user => {
+        output += `
+            <div class="contact-card">
+                <img src="${user.photo || 'https://cdn-icons-png.flaticon.com/512/847/847969.png'}">
+                
+                <div class="info">
+                    <b>${user.name}</b><br>
+                    📞 ${user.phone}<br>
+                    ✉️ ${user.email || 'No email'}
+                </div>
+
+                <button class="delete-btn" onclick="deleteContact('${user.id}')">Delete</button>
+            </div>
+        `;
+    });
+
+    document.getElementById("contacts").innerHTML = output;
+}
+
+
+// Add contact
+async function addContact() {
+    const name = document.getElementById("name").value;
+    const phone = document.getElementById("phone").value;
+    const email = document.getElementById("email").value;
+    const photo = document.getElementById("photo").value;
+
+    await fetch(apiURL, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ name, phone, email, photo })
+    });
+
+    loadContacts();
+}
+
+
+// Delete contact
+async function deleteContact(id) {
+    await fetch(`${apiURL}/${id}`, { method: "DELETE" });
+    loadContacts();
+}
+
+loadContacts();
+
+</script>
+
+</body>
+</html>
+
+
